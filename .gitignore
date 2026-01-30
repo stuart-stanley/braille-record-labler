@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# TODO: poetry.lock early dev -> remove and check in lock later
+poetry.lock
+
+# solid2 likes to generate scad and stl files a lot. Ignore them at the root level.
+*.scad
+*.stl

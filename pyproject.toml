@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "braille_record_labler"
+version = "0.0.0"
+description = "Tool to manage and produce braille labeled 'clips' to but on vinyel LPs"
+authors = ["Stuart Stanley <stu00@mac.com>"]
+readme = "README.md"
+packages = [
+    { include = "braille_record_labler" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4"
+solidpython2 = "^2.1.3"
+watchdog = "^6.0.0"
+touchmap = "^0.3.5"
+click = "^8.3.1"
+
+[tool.poetry.scripts]
+braille-record-labler = "braille_record_labler.labler_cli:labler_cli"
+
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core>=1.7.0", "poetry-dynamic-versioning>=1.1.0"]
+build-backend = "poetry.core.masonry.api"
