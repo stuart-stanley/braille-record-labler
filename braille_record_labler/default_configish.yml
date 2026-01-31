@@ -1,0 +1,14 @@
+printer_geometry:
+  'MA200':
+    bed_wide__mm: 110
+    bed_deep__mm: 110
+    bed_height__mm: 110
+active_printer: 'MA200'
+label_config:
+  lines_of_text: 2
+  max_depth__mm: 80
+  min_clip_width__mm: 1
+  max_clip_width__mm: 20
+  do_visual_letter_character: true
+  do_visual_braille_character: true
+  

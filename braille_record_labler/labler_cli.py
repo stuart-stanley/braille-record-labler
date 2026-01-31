@@ -1,4 +1,5 @@
 import click
+from . import configish
 
 
 @click.group('braille-record-labler')
@@ -7,9 +8,10 @@ import click
 @click.option('--config-ish-file')
 def braille_record_labler(ctx, lp_database_file, config_ish_file):
     print("rl", lp_database_file, config_ish_file, ctx)
+    cfgish = configish.load_config(config_ish_file)
     ctx.obj = {
         'lp_database': lp_database_file,
-        'config_ish': config_ish_file
+        'config_ish': cfgish
     }
 
 

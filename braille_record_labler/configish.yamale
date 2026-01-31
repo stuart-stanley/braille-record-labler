@@ -1,0 +1,18 @@
+printer_geometry: map(str(), include('printer_geometry'))
+active_printer: str()
+label_config: include('label_config')
+---
+printer_geometry:
+  bed_wide__mm: int(min=1)
+  bed_deep__mm: int(min=1)
+  bed_height__mm: int(min=1)
+---
+label_config:
+  max_depth__mm: int(min=1)
+  min_clip_width__mm: int(min=1)
+  max_clip_width__mm: int(min=1)
+  lines_of_text: int(min=1)
+  do_visual_text_line: int(required=False, min=0)
+  do_visual_letter_character: bool()
+  do_visual_braille_character: bool()
+  
