@@ -1,0 +1,7 @@
+# "state" releated to entries in the lp configuration (lp_db.yamale)
+record_data: map(str(), include('an_lp'), required=False)
+---
+an_lp:
+  printed_checksum: any(str(), null())
+  last_printed: any(timestamp(), null())
+  overall_style_version: int()

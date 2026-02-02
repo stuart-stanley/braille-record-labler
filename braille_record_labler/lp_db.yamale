@@ -1,0 +1,16 @@
+active_printer: str()
+label_format: include('label_format')
+record_data: map(str(), include('an_lp'))
+---
+an_lp:
+  full_artist: str()
+  short_artist: str(required=False)
+  full_lp_name: str()
+  short_lp_name: str(required=False)
+  override_format: include('label_format', required=False)
+---
+label_format:
+  min_forward_tag_depth__mm: int(min=0)
+  forward_tag_depth_characters: int(min=0)
+  forward_tag_do_visual_characters: bool()
+  do_visual_text_line: bool()
