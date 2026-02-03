@@ -76,8 +76,38 @@ class RecordClipController:
         ).forward(tab_depth__mm)
         braille_shift__mm = long_shift__mm + long_size[0]
         h_shape = long_h + span_h + back_h
-        final = h_shape + braille_panel.scad_model.right(braille_shift__mm)
+        h_and_braille = h_shape + braille_panel.scad_model.right(braille_shift__mm)
+        if lp_config.forward_tag_do_visual_characters:
+            txt_shape = self.__generate_visual_text(lp_config)
+            # the txt_shape is centered both along the y and x axis, so we will
+            # need to move it into the center of the tab area. In addition,
+            # the "back" of the text is up against the y/z plane, so we will
+            # need to push it along the x axis to touch the back of the tab.
+
+            txt_positioned = txt_shape.translate(
+                [long_shift__mm, tab_depth__mm / 2, self.total_height__mm / 2]
+            )
+            final = h_and_braille + txt_positioned
+        else:
+            final = h_and_braille
         print("HEY!", final.save_as_scad('foo.scad'))
+        # print("HEY!", final.save_as_stl('foo.stl'))
+
+    def __generate_visual_text(self, lp_config):
+        TODO_VISUAL_TEXT_HEIGHT__MM = 1
+        txt_chars = lp_config.full_artist[:lp_config.forward_tag_depth_characters]
+        assert len(txt_chars) > 0
+        txt_shape = bosl2.text3d(
+            txt_chars,
+            TODO_VISUAL_TEXT_HEIGHT__MM,
+            center=True,
+            anchor=TOP,
+        )
+        rotated_txt = txt_shape.rotate([90, 0, -90])
+        # the text is now "sitting" centered along both x and y with
+        # its "front" touching the y/z plane. Let's shove it so the back
+        # it touching instead and return it.
+        return rotated_txt.translate([-TODO_VISUAL_TEXT_HEIGHT__MM, 0, 0])
 
     def validate(self, using_printer_name):
         printer = self.__cfgish.printer_geometry[using_printer_name]
@@ -97,4 +127,5 @@ class RecordClipController:
                 self.total_height__mm, using_printer_name, printer.bed_height__mm)
             errors.append(e)
         # TODO: all clip width check
+        # TODO: font text fitting on tab
         return errors, warnings

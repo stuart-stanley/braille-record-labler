@@ -2,7 +2,7 @@ import touchmap
 import solid2
 import math
 
-CIRCLE_FN = 72    # segments to make a circle
+CIRCLE_FN = 16    # segments to make a circle
 
 # https://brailleaustralia.org/about-braille/physical-specifications-for-braille/
 DOT_ROD_HEIGHT__MM = 0.6   # spec: this plus sphere-height is 0.6 to 0.9mm
