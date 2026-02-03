@@ -1,6 +1,7 @@
 overall_style_version: int()    # bump to basically force reprinting ALL the labels!
 printer_geometry: map(str(), include('printer_geometry'))
 label_config: include('label_config')
+tag_geometry: include('tag_geometry')
 ---
 printer_geometry:
   bed_wide__mm: int(min=1)
@@ -11,3 +12,9 @@ label_config:
   max_depth__mm: int(min=1)
   min_clip_width__mm: int(min=1)
   max_clip_width__mm: int(min=1)
+---
+tag_geometry:
+  line_segments_per_circle: int(min=0, max=128)
+  wing_thickness__mm: int(min=1, max=64)
+  span_thickness__mm: int(min=1, max=64)
+  visual_text_height__mm: int(min=1, max=5)

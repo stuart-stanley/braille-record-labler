@@ -4,10 +4,6 @@ from . import configish
 from . import braille_scad
 
 
-WING_THICKNESS__MM = 3    # the thickness of each of the clip's "wings"
-SPAN_THICKNESS__MM = 4    # the short bit on the front of the clip
-
-
 class RecordClipController:
     def __init__(self, lp_config, configish_file=None):
         self.__cfgish = configish.load_config(configish_file)
@@ -15,7 +11,8 @@ class RecordClipController:
 
         # Step 1: make and see how big the braille wants to be...
         lines = [lp_config.short_artist, lp_config.short_lp_name]
-        braille_panel = braille_scad.MultilineBrailleScad(lines)
+        braille_panel = braille_scad.MultilineBrailleScad(
+            lines, circle_fn=self.__cfgish.tag_geometry.line_segments_per_circle)
         self.__braille_panel = braille_panel
 
         # ok! now lets make the parts of the "h"ish shape that will the clip.
@@ -38,8 +35,9 @@ class RecordClipController:
         # so we can use whole_depth__mm here.
         self.total_depth__mm = whole_depth__mm
         self.total_height__mm = braille_panel.height__mm
-        long_size = [WING_THICKNESS__MM, self.total_depth__mm, self.total_height__mm]
-        back_size = [WING_THICKNESS__MM, lp_config.back_side_depth__mm, self.total_height__mm]
+        wt__mm = self.__cfgish.tag_geometry.wing_thickness__mm
+        long_size = [wt__mm, self.total_depth__mm, self.total_height__mm]
+        back_size = [wt__mm, lp_config.back_side_depth__mm, self.total_height__mm]
         # we want the span piece to be rounded at top/bottom (thin edge) as
         # well as having the long and back pieces rounded on all edges. This
         # means by default, there would be little bit of rounding at the join
@@ -54,7 +52,7 @@ class RecordClipController:
         extra_span_long__mm = long_size[0] / 2
         span_x_shift__mm = extra_span_back__mm
         adj_span_width = TODO_SPAN_WIDTH__MM + extra_span_back__mm + extra_span_long__mm
-        span_size = [adj_span_width, SPAN_THICKNESS__MM, self.total_height__mm]
+        span_size = [adj_span_width, self.__cfgish.tag_geometry.span_thickness__mm, self.total_height__mm]
         long_shift__mm = back_size[0] + span_size[0] - span_x_shift__mm
         long_h = bosl2.cuboid(
             long_size,
@@ -94,12 +92,12 @@ class RecordClipController:
         # print("HEY!", final.save_as_stl('foo.stl'))
 
     def __generate_visual_text(self, lp_config):
-        TODO_VISUAL_TEXT_HEIGHT__MM = 1
+        visual_text_height__mm = self.__cfgish.tag_geometry.visual_text_height__mm
         txt_chars = lp_config.full_artist[:lp_config.forward_tag_depth_characters]
         assert len(txt_chars) > 0
         txt_shape = bosl2.text3d(
             txt_chars,
-            TODO_VISUAL_TEXT_HEIGHT__MM,
+            visual_text_height__mm,
             center=True,
             anchor=TOP,
         )
@@ -107,7 +105,7 @@ class RecordClipController:
         # the text is now "sitting" centered along both x and y with
         # its "front" touching the y/z plane. Let's shove it so the back
         # it touching instead and return it.
-        return rotated_txt.translate([-TODO_VISUAL_TEXT_HEIGHT__MM, 0, 0])
+        return rotated_txt.translate([-1 * visual_text_height__mm, 0, 0])
 
     def validate(self, using_printer_name):
         printer = self.__cfgish.printer_geometry[using_printer_name]

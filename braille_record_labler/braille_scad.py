@@ -52,13 +52,13 @@ LINE_TO_LINE__MM = 10
 
 
 class _CellInfo:
-    def __init__(self, uni_char, bin_map):
-        print(uni_char, bin_map)
+    def __init__(self, uni_char, bin_map, circle_fn=CIRCLE_FN):
         assert len(uni_char) == 1
         assert len(bin_map) == 6, \
             '{} != 6'.format(len(bin_map))
         self.__unicode_char = uni_char
         self.__bin_map = bin_map
+        self.__circle_fn = circle_fn
 
     @property
     def unicode(self):
@@ -110,7 +110,8 @@ class _CellInfo:
 
 
 class MultilineBrailleScad:
-    def __init__(self, str_list):
+    def __init__(self, str_list, circle_fn=CIRCLE_FN):
+        self.__circle_fn = circle_fn
         current_height__mm = len(str_list) * LINE_TO_LINE__MM
         full_scad = solid2.union()
         max_depth__mm = -1
@@ -148,7 +149,6 @@ class MultilineBrailleScad:
     def __str_to_braille_scad(self, src_string):
         # Step 1: use touchmap to make both the unicode and raised-map forms
         #  Note: because this is grade-2, we lose the 1:1 mapping from str_string[x] to the output.
-        print(":::::", src_string)
         uni_br = touchmap.text_to_braille(src_string, grade=2)
         cell_bin_str = touchmap.text_to_braille(src_string, grade=2, binary=True)
         assert (len(uni_br) == len(cell_bin_str) / 6)
@@ -158,8 +158,8 @@ class MultilineBrailleScad:
         out_scad = solid2.union()
         for inx in range(0, len(uni_br)):
             bin_clip = cell_bin_str[inx*6:]
-            cell = _CellInfo(uni_br[inx], bin_clip[:6])
-            cell.dump_dot_values()
+            cell = _CellInfo(uni_br[inx], bin_clip[:6], self.__circle_fn)
+            # cell.dump_dot_values()
             out_scad += solid2.translate([0, inx * CELL_SPACING__MM + MARGIN__MM, 0])(
                 solid2.color(colors[inx % 3])(
                     cell.to_scad()
