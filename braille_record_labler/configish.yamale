@@ -11,5 +11,3 @@ label_config:
   max_depth__mm: int(min=1)
   min_clip_width__mm: int(min=1)
   max_clip_width__mm: int(min=1)
-  lines_of_text: int(min=1)
-  

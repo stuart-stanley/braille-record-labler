@@ -5,8 +5,7 @@ printer_geometry:
     bed_deep__mm: 110
     bed_height__mm: 110
 label_config:
-  lines_of_text: 2
-  max_depth__mm: 80
+  max_depth__mm: 100
   min_clip_width__mm: 1
   max_clip_width__mm: 20
   

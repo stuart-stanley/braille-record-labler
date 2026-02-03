@@ -212,3 +212,6 @@ poetry.lock
 # solid2 likes to generate scad and stl files a lot. Ignore them at the root level.
 *.scad
 *.stl
+
+lp_database.yml
+lp_database_state.yml

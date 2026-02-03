@@ -13,4 +13,5 @@ label_format:
   min_forward_tag_depth__mm: int(min=0)
   forward_tag_depth_characters: int(min=0)
   forward_tag_do_visual_characters: bool()
-  do_visual_text_line: bool()
+  back_side_depth__mm: int(min=1)
+  front_side_min_depth__mm: int(min=1)

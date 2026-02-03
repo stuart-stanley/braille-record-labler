@@ -1,9 +1,11 @@
+import sys
 import click
 from rich import print
 from rich.console import Console
 import rich
 from . import configish
 from . import label_tracker
+from . import clip_maker
 
 console = Console()
 
@@ -17,7 +19,8 @@ def braille_record_labler(ctx, lp_database_file, config_ish_file):
     label_db = label_tracker.RecordDataAccess(cfgish, lp_database_file)
     ctx.obj = {
         'lp_database': label_db,
-        'config_ish': cfgish
+        'config_ish': cfgish,
+        'configish_file': config_ish_file,
     }
 
 
@@ -51,7 +54,7 @@ def list(ctx):
     print("  forward_tag_do_visual_characters: {}".format(
         dfl.forward_tag_do_visual_characters))
     # TODO: add bed/printer info. maybe new command
-    print("  do_visual_text_line:              {}".format(dfl.do_visual_text_line))
+    print("  back_side_depth__mm:              {}".format(dfl.back_side_depth__mm))
     print("overall style version (OSV): {}".format(cfi.overall_style_version))
     t = rich.table.Table(title="defined records")
     t.add_column("lp-key")
@@ -60,7 +63,7 @@ def list(ctx):
     t.add_column("OSV")
     t.add_column('cksum')
     t.add_column('last-printed')
-    t.add_column('do-visual')
+    t.add_column('back-depth')
     t.add_column('min-tag-depth-mm')
     t.add_column('tag-chars')
     t.add_column('visual-tag-chars')
@@ -82,7 +85,7 @@ def list(ctx):
             str(lp.format_overridden),
             lp.printed_checksum,
             last_printed,
-            _format_diffed(dfl, lp, 'do_visual_text_line'),
+            _format_diffed(dfl, lp, 'back_side_depth__mm'),
             _format_diffed(dfl, lp, 'min_forward_tag_depth__mm'),
             _format_diffed(dfl, lp, 'forward_tag_depth_characters'),
             _format_diffed(dfl, lp, 'forward_tag_do_visual_characters'),
@@ -97,11 +100,35 @@ def lp():
     pass
 
 
+def _common_print_and_validate(ctx, lp_index_name):
+    lpd = ctx.obj['lp_database']
+    if lp_index_name not in lpd.lp_keys():
+        raise click.BadParameter("record '{}' not in list of '{}'".format(
+            lp_index_name, lpd.lp_keys()))
+        print("z"*100)
+    lp = lpd.lp_by_key(lp_index_name)
+    clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
+    errors, warnings = clip_ctl.validate(lpd.active_printer_name)
+    print("Info for print of {} on {}:".format(lp_index_name, lpd.active_printer_name))
+    print("  total depth along record:     {}mm".format(clip_ctl.total_depth__mm))
+    print("  total height:                 {}mm".format(clip_ctl.total_height__mm))
+    print("  todo: more info")
+
+    for warning in warnings:
+        print("[yellow]{}[/yellow]".format(warning))
+    for error in errors:
+        print("[red]{}[/red]".format(error))
+    if len(errors) > 0:
+        sys.exit(10)
+    return clip_ctl
+
+
 @lp.command()
 @click.argument('lp_index_name')
 @click.pass_context
 def validate(ctx, lp_index_name):
-    print("validate", lp_index_name)
+    clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+    print(clip_ctl)
 
 
 @lp.command()

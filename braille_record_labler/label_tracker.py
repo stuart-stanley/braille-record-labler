@@ -33,7 +33,6 @@ class _Record:
         cksum.update(str(self.min_forward_tag_depth__mm).encode('utf-8'))
         cksum.update(str(self.forward_tag_depth_characters).encode('utf-8'))
         cksum.update(str(self.forward_tag_do_visual_characters).encode('utf-8'))
-        cksum.update(str(self.do_visual_text_line).encode('utf-8'))
         self.calculated_checksum = cksum.hexdigest()
         self.__state = state_data
 
@@ -56,7 +55,11 @@ class _Record:
         self.min_forward_tag_depth__mm = use_format['min_forward_tag_depth__mm']
         self.forward_tag_depth_characters = use_format['forward_tag_depth_characters']
         self.forward_tag_do_visual_characters = use_format['forward_tag_do_visual_characters']
-        self.do_visual_text_line = use_format['do_visual_text_line']
+        self.back_side_depth__mm = use_format['back_side_depth__mm']
+        self.front_side_min_depth__mm = use_format['front_side_min_depth__mm']
+        assert self.back_side_depth__mm <= self.front_side_min_depth__mm, \
+            'min front {} must be >= min back {}'.format(
+                self.front_side_min_depth__mm, self.back_side_depth__mm)
 
     def needs_to_print(self):
         if self.__global_overall_style_version != self.__state.overall_style_version:
@@ -103,6 +106,7 @@ class RecordDataAccess:
         # yamale CAN handle multiple documents. We only do one, so:
         state_data = state_data[0][0]
 
+        self.active_printer_name = main_data['active_printer']
         # Scan the list of records and create a Record() for each. We
         # fill in a blank state if one doesn't already exist.
         self.__lp_map = {}
@@ -120,6 +124,12 @@ class RecordDataAccess:
 
             a_state = munch.munchify(a_state)
             self.__lp_map[lp_key] = _Record(label_format, lp_key, lp_data, a_state, cfgish)
+
+    def lp_keys(self):
+        return list(self.__lp_map.keys())
+
+    def lp_by_key(self, lp_key):
+        return self.__lp_map[lp_key]
 
     def lps(self, sort=True):
         slpk = list(self.__lp_map.keys())
