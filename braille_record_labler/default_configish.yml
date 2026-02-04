@@ -5,11 +5,11 @@ printer_geometry:
     bed_deep__mm: 110
     bed_height__mm: 110
 label_config:
-  max_depth__mm: 100
+  max_depth__mm: 110
   min_clip_width__mm: 1
   max_clip_width__mm: 20
 tag_geometry:
-  line_segments_per_circle: 16 # aka the stupidly named "fn" :eyeroll:
+  line_segments_per_circle: 16   # aka the stupidly named "fn" :eyeroll:
   wing_thickness__mm:       3    # each wing of the clip
   span_thickness__mm:       4    # that short bridge up front between the wings.
   visual_text_height__mm:   1    # height of visual font from back of tab

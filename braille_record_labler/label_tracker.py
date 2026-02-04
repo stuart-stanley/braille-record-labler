@@ -24,6 +24,7 @@ class _Record:
         else:
             self.__init_format(def_label_format)
             self.format_overridden = False
+        self.thickness__mm = lp_data['thickness__mm']
         cksum = hashlib.sha256()
         cksum.update(self.lp_key.encode('utf-8'))
         cksum.update(self.full_artist.encode('utf-8'))
@@ -33,6 +34,7 @@ class _Record:
         cksum.update(str(self.min_forward_tag_depth__mm).encode('utf-8'))
         cksum.update(str(self.forward_tag_depth_characters).encode('utf-8'))
         cksum.update(str(self.forward_tag_do_visual_characters).encode('utf-8'))
+        cksum.update(str(self.thickness__mm).encode('utf-8'))
         self.calculated_checksum = cksum.hexdigest()
         self.__state = state_data
 

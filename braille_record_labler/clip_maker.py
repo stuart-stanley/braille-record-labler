@@ -1,4 +1,4 @@
-from solid2.extensions.bosl2 import BOTTOM, FRONT, LEFT, TOP
+from solid2.extensions.bosl2 import BOTTOM, FRONT, LEFT, TOP, RIGHT, BACK
 from solid2.extensions import bosl2
 from . import configish
 from . import braille_scad
@@ -47,11 +47,11 @@ class RecordClipController:
         # the one that touches at x=0
         # TODO: this still isn't perfect. I probably need to figure out regions
         #   and advanced rounding.
-        TODO_SPAN_WIDTH__MM = 4
+        span_width__mm = lp_config.thickness__mm
         extra_span_back__mm = back_size[0] / 2
         extra_span_long__mm = long_size[0] / 2
         span_x_shift__mm = extra_span_back__mm
-        adj_span_width = TODO_SPAN_WIDTH__MM + extra_span_back__mm + extra_span_long__mm
+        adj_span_width = span_width__mm + extra_span_back__mm + extra_span_long__mm
         span_size = [adj_span_width, self.__cfgish.tag_geometry.span_thickness__mm, self.total_height__mm]
         long_shift__mm = back_size[0] + span_size[0] - span_x_shift__mm
         long_h = bosl2.cuboid(
@@ -67,11 +67,25 @@ class RecordClipController:
             edges=[FRONT+TOP, FRONT+BOTTOM],
         ).right(back_size[0] - span_x_shift__mm).forward(tab_depth__mm)
 
-        back_h = bosl2.cuboid(
-            back_size,
-            rounding=back_size[0] / 2,   # max rounding
-            anchor=FRONT+BOTTOM+LEFT
-        ).forward(tab_depth__mm)
+        taper__mm = 2
+        top__mm = wt__mm + taper__mm
+        back_h = bosl2.prismoid(
+            [wt__mm, self.total_height__mm],
+            [top__mm, self.total_height__mm],
+            shift=[-(wt__mm / 2), 0],
+            h=lp_config.back_side_depth__mm,
+            # rounding=1.5,
+        ).rotate(
+            [90, 0, 0]
+        )
+
+        print("HEY!", back_h.save_as_scad('foo.scad'))
+        return
+        x.rotate(
+            [90, 0, 0]
+        ).forward(
+            tab_depth__mm + lp_config.back_side_depth__mm
+        )#.right(wt__mm)
         braille_shift__mm = long_shift__mm + long_size[0]
         h_shape = long_h + span_h + back_h
         h_and_braille = h_shape + braille_panel.scad_model.right(braille_shift__mm)
