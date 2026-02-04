@@ -79,8 +79,7 @@ class RecordClipController:
 
         # now the bump near the remote end of the back plate.
         #  We make a cylinder and then remove a cube to make a semi-cylinder.
-        # Make the radius 1/3 of the lp thickness or 2 TODOcfg
-        br = max(lp_config.thickness__mm / 3, 2)
+        br = lp_config
         bump_cyl = bosl2.cyl(
             r=br,
             length=self.total_height__mm,

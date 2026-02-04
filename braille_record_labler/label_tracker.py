@@ -26,6 +26,11 @@ class _Record:
         else:
             self.__init_format(def_label_format)
             self.format_overridden = False
+
+        if 'override_pressure_bump__mm' in lp_data:
+            self.pressure_bump__mm = lp_data['overide_pressure_bump__mm']
+        else:
+            self.pressure_bump__mm = self.default_pressure_bump__mm
         self.thickness__mm = lp_data['thickness__mm']
         cksum = hashlib.sha256()
         cksum.update(self.lp_key.encode('utf-8'))
@@ -33,10 +38,14 @@ class _Record:
         cksum.update(self.short_artist.encode('utf-8'))
         cksum.update(self.full_lp_name.encode('utf-8'))
         cksum.update(self.short_lp_name.encode('utf-8'))
+        cksum.update(str(self.thickness__mm).encode('utf-8'))
+        cksum.update(str(self.pressure_bump__mm).encode('utf-8'))
         cksum.update(str(self.min_forward_tag_depth__mm).encode('utf-8'))
         cksum.update(str(self.forward_tag_depth_characters).encode('utf-8'))
         cksum.update(str(self.forward_tag_do_visual_characters).encode('utf-8'))
-        cksum.update(str(self.thickness__mm).encode('utf-8'))
+        cksum.update(str(self.back_side_depth__mm).encode('utf-8'))
+        cksum.update(str(self.front_side_min_depth__mm).encode('utf-8'))
+        cksum.update(str(self.default_pressure_bump__mm).encode('utf-8'))
         self.calculated_checksum = cksum.hexdigest()
         self.__state = state_data
 
@@ -61,6 +70,7 @@ class _Record:
         self.forward_tag_do_visual_characters = use_format['forward_tag_do_visual_characters']
         self.back_side_depth__mm = use_format['back_side_depth__mm']
         self.front_side_min_depth__mm = use_format['front_side_min_depth__mm']
+        self.default_pressure_bump__mm = use_format['default_pressure_bump__mm']
         assert self.back_side_depth__mm <= self.front_side_min_depth__mm, \
             'min front {} must be >= min back {}'.format(
                 self.front_side_min_depth__mm, self.back_side_depth__mm)
