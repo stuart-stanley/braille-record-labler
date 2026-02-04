@@ -1,5 +1,6 @@
 import sys
 import click
+from pathlib import Path
 from rich import print
 from rich.console import Console
 import rich
@@ -95,11 +96,6 @@ def list(ctx):
     console.print(t)
 
 
-@braille_record_labler.group()
-def lp():
-    pass
-
-
 def _common_print_and_validate(ctx, lp_index_name):
     lpd = ctx.obj['lp_database']
     if lp_index_name not in lpd.lp_keys():
@@ -118,21 +114,70 @@ def _common_print_and_validate(ctx, lp_index_name):
         print("[yellow]{}[/yellow]".format(warning))
     for error in errors:
         print("[red]{}[/red]".format(error))
-    if len(errors) > 0:
-        sys.exit(10)
-    return clip_ctl
+    return len(errors) == 0, clip_ctl
 
 
-@lp.command()
+@braille_record_labler.command()
 @click.argument('lp_index_name')
 @click.pass_context
 def validate(ctx, lp_index_name):
-    clip_ctl = _common_print_and_validate(ctx, lp_index_name)
-    print(clip_ctl)
+    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+    if not valid:
+        sys.exit(10)
 
 
-@lp.command()
+def _setup_output(output_path, file_name, lp_index_name, default_suffix):
+    output_path = Path(output_path)
+    output_path.mkdir(exist_ok=True, parents=True)
+    if not output_path.is_dir():
+        print("output_path is not a directory")
+        sys.exit(11)
+    if file_name is None:
+        file_name = '{}.{}'.format(lp_index_name, default_suffix)
+
+    full_path = output_path / file_name
+    return output_path, full_path
+
+
+@braille_record_labler.command()
+@click.argument('lp_index_name')
+@click.option('--output-path', '-p', default='./generated', type=click.types.Path())
+@click.option('--file-name', '-f', type=click.types.File())
+@click.pass_context
+def generate(ctx, lp_index_name, output_path, file_name):
+    op, ofp = _setup_output(output_path, file_name, lp_index_name, 'scad')
+    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+    if not valid:
+        sys.exit(10)
+    clip_ctl.do_scad(ofp)
+    print("{} generated".format(ofp))
+
+
+@braille_record_labler.command()
+@click.argument('lp_index_name')
+@click.option('--output-path', '-p', default='./generated', type=click.types.Path())
+@click.option('--file-name', '-f', type=click.types.File())
+@click.pass_context
+def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
+    op, ofp = _setup_output(output_path, file_name, lp_index_name, 'stl')
+    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+    if not valid:
+        sys.exit(10)
+    clip_ctl.do_stl(ofp)
+    print_name = ctx.parent.info_name
+    print("{} generated".format(ofp))
+    print("")
+    print("Load the stl file into your print software and print.")
+    print("When complete, run '{} complete {}'".format(print_name, lp_index_name))
+
+
+@braille_record_labler.command()
 @click.argument('lp_index_name')
 @click.pass_context
-def generate(ctx, lp_index_name):
-    print("generate", lp_index_name, ctx.obj)
+def complete(ctx, lp_index_name):
+    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+    if not valid:
+        print("Can not complete print while config is invalid.")
+        sys.exit(10)
+    lpd = ctx.obj['lp_database']
+    lpd.complete_print(lp_index_name)

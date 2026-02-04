@@ -1,3 +1,4 @@
+from pathlib import Path
 from solid2.extensions.bosl2 import BOTTOM, FRONT, LEFT, TOP, RIGHT, BACK
 from solid2.extensions import bosl2
 from . import configish
@@ -112,8 +113,30 @@ class RecordClipController:
             final = h_and_braille + txt_positioned
         else:
             final = h_and_braille
-        print("HEY!", final.save_as_scad('foo.scad'))
-        # print("HEY!", final.save_as_stl('foo.stl'))
+        self.__openscad_model = final
+        self.__validated = False
+        self.__is_valid = False
+
+    def __assert_validity(self):
+        assert self.__validated, \
+           'coding error: attempting to use model before validated.'
+        assert self.__is_valid, \
+            'coding error: attempt to use model that failed to validate.'
+
+    def do_scad(self, filepath=None):
+        self.__assert_validity()
+        if filepath is None:
+            fname = '{}.scad'.format(self.__lp_cfg.lp_key)
+            filepath = Path('.').resolve() / fname
+        self.__openscad_model.save_as_scad(filepath)
+
+    def do_stl(self, filepath=None):
+        self.__assert_validity()
+        print("Note: this can take up to a few minutes")
+        if filepath is None:
+            fname = '{}.stl'.format(self.__lp_cfg.lp_key)
+            filepath = Path('.').resolve() / fname
+        self.__openscad_model.save_as_stl(filepath)
 
     def __generate_visual_text(self, lp_config):
         visual_text_height__mm = self.__cfgish.tag_geometry.visual_text_height__mm
@@ -150,4 +173,7 @@ class RecordClipController:
             errors.append(e)
         # TODO: all clip width check
         # TODO: font text fitting on tab
+        self.__validated = True
+        if len(errors) == 0:
+            self.__is_valid = True
         return errors, warnings

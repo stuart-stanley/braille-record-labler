@@ -1,6 +1,8 @@
 import yamale
 import hashlib
 import munch
+import yaml
+from datetime import datetime
 from pathlib import Path
 
 
@@ -76,6 +78,13 @@ class _Record:
 
         return False, None
 
+    def complete_print(self):
+        self.__state.last_printed = datetime.now()
+        self.__state.printed_checksum = self.calculated_checksum
+
+    def state_for_save(self):
+        return dict(self.__state)
+
 
 class RecordDataAccess:
     def __init__(self, cfgish, db_cfg_file, db_state_dir_path=None):
@@ -98,6 +107,7 @@ class RecordDataAccess:
 
         state_name = "{}_state.yml".format(lp_path.stem)
         state_path = Path(state_name)
+        self.__state_path = state_path
         if not state_path.exists():
             # create a blank to use
             state_path.write_text("record_data:\n")
@@ -106,7 +116,7 @@ class RecordDataAccess:
         state_data = yamale.make_data(state_path)
         yamale.validate(self.__db_state_schema, state_data)
         # yamale CAN handle multiple documents. We only do one, so:
-        state_data = state_data[0][0]
+        state_data = state_data[0][0]['record_data']
 
         self.active_printer_name = main_data['active_printer']
         # Scan the list of records and create a Record() for each. We
@@ -138,3 +148,14 @@ class RecordDataAccess:
         slpk = sorted(slpk)
         for lp_key in slpk:
             yield lp_key, self.__lp_map[lp_key]
+
+    def complete_print(self, lp_key):
+        lp = self.lp_by_key(lp_key)
+        lp.complete_print()
+
+        write_data = {'record_data': {}}
+        for lp_key, lp in self.lps():
+            write_data['record_data'][lp_key] = lp.state_for_save()
+
+        with self.__state_path.open('w') as state_file:
+            yaml.dump(write_data, state_file)
