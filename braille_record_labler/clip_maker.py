@@ -11,8 +11,8 @@ class RecordClipController:
 
         # Step 1: make and see how big the braille wants to be...
         lines = [lp_config.short_artist, lp_config.short_lp_name]
-        braille_panel = braille_scad.MultilineBrailleScad(
-            lines, circle_fn=self.__cfgish.tag_geometry.line_segments_per_circle)
+        circle_fn = self.__cfgish.tag_geometry.line_segments_per_circle
+        braille_panel = braille_scad.MultilineBrailleScad(lines, circle_fn=circle_fn)
         self.__braille_panel = braille_panel
 
         # ok! now lets make the parts of the "h"ish shape that will the clip.
@@ -56,38 +56,48 @@ class RecordClipController:
         long_shift__mm = back_size[0] + span_size[0] - span_x_shift__mm
         long_h = bosl2.cuboid(
             long_size,
-            rounding=long_size[0] / 2,   # max rounding
+            rounding=long_size[0]/2,   # max rounding
+            _fn=circle_fn,
             anchor=FRONT+BOTTOM+LEFT
         ).right(long_shift__mm)
 
         span_h = bosl2.cuboid(
             span_size,
-            rounding=span_size[1] / 2,   # max rounding
+            rounding=span_size[1]/2,   # max rounding
+            _fn=circle_fn,
             anchor=FRONT+BOTTOM+LEFT,
             edges=[FRONT+TOP, FRONT+BOTTOM],
         ).right(back_size[0] - span_x_shift__mm).forward(tab_depth__mm)
 
-        taper__mm = 2
-        top__mm = wt__mm + taper__mm
-        back_h = bosl2.prismoid(
-            [wt__mm, self.total_height__mm],
-            [top__mm, self.total_height__mm],
-            shift=[-(wt__mm / 2), 0],
-            h=lp_config.back_side_depth__mm,
-            # rounding=1.5,
-        ).rotate(
-            [90, 0, 0]
-        )
+        back_plate = bosl2.cuboid(
+            back_size,
+            rounding=back_size[0]/2,    # max rounding
+            _fn=circle_fn,
+            anchor=FRONT+BOTTOM+LEFT,
+        ).forward(tab_depth__mm)
 
-        print("HEY!", back_h.save_as_scad('foo.scad'))
-        return
-        x.rotate(
-            [90, 0, 0]
-        ).forward(
-            tab_depth__mm + lp_config.back_side_depth__mm
-        )#.right(wt__mm)
+        # now the bump near the remote end of the back plate.
+        #  We make a cylinder and then remove a cube to make a semi-cylinder.
+        # Make the radius 1/3 of the lp thickness or 2 TODOcfg
+        br = max(lp_config.thickness__mm / 3, 2)
+        bump_cyl = bosl2.cyl(
+            r=br,
+            length=self.total_height__mm,
+            rounding=br/2,    # max rounding
+            _fn=circle_fn,
+            anchor=BACK+BOTTOM
+        )
+        bump_rm = bosl2.cuboid(
+            [br, br*2, self.total_height__mm],
+            anchor=RIGHT+BACK+BOTTOM
+        )
+        bump_semi = bump_cyl - bump_rm
+        # y-off is tab size plus back length minus the rounding on the back plate
+        y_off = lp_config.back_side_depth__mm + tab_depth__mm - back_size[0] / 2
+        bump_pos = bump_semi.translate([wt__mm, y_off, 0])
+
         braille_shift__mm = long_shift__mm + long_size[0]
-        h_shape = long_h + span_h + back_h
+        h_shape = long_h + span_h + back_plate + bump_pos
         h_and_braille = h_shape + braille_panel.scad_model.right(braille_shift__mm)
         if lp_config.forward_tag_do_visual_characters:
             txt_shape = self.__generate_visual_text(lp_config)
