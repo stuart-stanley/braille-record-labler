@@ -79,7 +79,7 @@ class RecordClipController:
 
         # now the bump near the remote end of the back plate.
         #  We make a cylinder and then remove a cube to make a semi-cylinder.
-        br = lp_config
+        br = lp_config.pressure_bump__mm
         bump_cyl = bosl2.cyl(
             r=br,
             length=self.total_height__mm,

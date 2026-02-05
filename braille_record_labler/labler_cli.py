@@ -101,7 +101,6 @@ def _common_print_and_validate(ctx, lp_index_name):
     if lp_index_name not in lpd.lp_keys():
         raise click.BadParameter("record '{}' not in list of '{}'".format(
             lp_index_name, lpd.lp_keys()))
-        print("z"*100)
     lp = lpd.lp_by_key(lp_index_name)
     clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
     errors, warnings = clip_ctl.validate(lpd.active_printer_name)
@@ -121,9 +120,33 @@ def _common_print_and_validate(ctx, lp_index_name):
 @click.argument('lp_index_name')
 @click.pass_context
 def validate(ctx, lp_index_name):
-    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
-    if not valid:
-        sys.exit(10)
+    if lp_index_name == 'all':
+        lpd = ctx.obj['lp_database']
+        t = rich.table.Table(title="validation summary")
+        t.add_column("lp-key")
+        t.add_column("artist")
+        t.add_column("lp_name")
+        t.add_column("errors")
+        t.add_column("warnings")
+
+        for lp_key, lp in lpd.lps():
+            artist = _short_long_format(lp.full_artist, lp.short_artist)
+            lp_name = _short_long_format(lp.full_lp_name, lp.short_lp_name)
+
+            clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
+            errors, warnings = clip_ctl.validate(lpd.active_printer_name)
+            t.add_row(
+                lp.lp_key,
+                artist,
+                lp_name,
+                str(len(errors)),
+                str(len(warnings))
+            )
+        console.print(t)
+    else:
+        valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+        if not valid:
+            sys.exit(10)
 
 
 def _setup_output(output_path, file_name, lp_index_name, default_suffix):
