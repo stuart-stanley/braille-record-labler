@@ -197,14 +197,9 @@ def _setup_output(output_path, file_name, lp_index_name, default_suffix):
     return output_path, full_path
 
 
-@braille_record_labler.command()
-@click.argument('lp_index_name')
-@click.option('--output-path', '-p', default='./generated', type=click.types.Path())
-@click.option('--file-name', '-f', type=click.types.File())
-@click.pass_context
-def generate(ctx, lp_index_name, output_path, file_name):
-    op, ofp = _setup_output(output_path, file_name, lp_index_name, 'scad')
-    valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
+def _do_one_generate(ctx, output_path, file_name, lp_key):
+    op, ofp = _setup_output(output_path, file_name, lp_key, 'scad')
+    valid, clip_ctl = _common_print_and_validate(ctx, lp_key)
     if not valid:
         sys.exit(10)
     clip_ctl.do_scad(ofp)
@@ -214,9 +209,20 @@ def generate(ctx, lp_index_name, output_path, file_name):
 @braille_record_labler.command()
 @click.argument('lp_index_name')
 @click.option('--output-path', '-p', default='./generated', type=click.types.Path())
-@click.option('--file-name', '-f', type=click.types.File())
+@click.option('--file-name', '-f')
 @click.pass_context
-def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
+def generate(ctx, lp_index_name, output_path, file_name):
+    lpd = ctx.obj['lp_database']
+    if lp_index_name == 'unprinted':
+        if file_name is not None:
+            raise click.BadParameter("Can not generate all AND set output file name")
+        for lp_key, lp in lpd.lps():
+            _do_one_generate(ctx, output_path, file_name, lp_key)
+    else:
+        _do_one_generate(ctx, output_path, file_name, lp_key)
+
+
+def _do_one_print(ctx, output_path, file_name, lp_index_name):
     lpd = ctx.obj['lp_database']
     op, ofp = _setup_output(output_path, file_name, lp_index_name, 'stl')
     valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
@@ -229,6 +235,27 @@ def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
     print("")
     print("Load the stl file into your print software and print.")
     print("When complete, run '{} complete {}'".format(print_name, lp_index_name))
+
+
+@braille_record_labler.command()
+@click.argument('lp_index_name')
+@click.option('--output-path', '-p', default='./generated', type=click.types.Path())
+@click.option('--file-name', '-f')
+@click.pass_context
+def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
+    lpd = ctx.obj['lp_database']
+    if lp_index_name == 'unprinted':
+        if file_name is not None:
+            raise click.BadParameter("Can not print all AND set output file name")
+        for lp_key, lp in lpd.lps():
+            if not lp.needs_to_print()[0]:
+                print("{} already printed".format(lp_key))
+            elif lp.out_for_printing:
+                print("{} already out for printing".format(lp_key))
+            else:
+                _do_one_print(ctx, output_path, file_name, lp_key)
+    else:
+        _do_one_print(ctx, output_path, file_name, lp_key)
 
 
 @braille_record_labler.command()
