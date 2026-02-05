@@ -61,7 +61,9 @@ def list(ctx):
     t.add_column("lp-key")
     t.add_column("artist")
     t.add_column("lp_name")
-    t.add_column("OSV")
+    t.add_column('thickness')
+    t.add_column('bump-mm')
+    t.add_column("format")
     t.add_column('cksum')
     t.add_column('last-printed')
     t.add_column('back-depth')
@@ -79,12 +81,22 @@ def list(ctx):
         else:
             last_printed = str(lp.last_printed)
         needs_to_print, why_print = lp.needs_to_print()
+        if lp.format_overridden:
+            fmat = 'lp-specific'
+        else:
+            fmat = 'collection'
+        if lp.printed_checksum is None:
+            cksum = "not-set"
+        else:
+            cksum = "set"
         t.add_row(
             lp.lp_key,
             artist,
             lp_name,
-            str(lp.format_overridden),
-            lp.printed_checksum,
+            str(lp.thickness__mm),
+            str(lp.pressure_bump__mm),
+            fmat,
+            cksum,
             last_printed,
             _format_diffed(dfl, lp, 'back_side_depth__mm'),
             _format_diffed(dfl, lp, 'min_forward_tag_depth__mm'),
@@ -107,7 +119,6 @@ def _common_print_and_validate(ctx, lp_index_name):
     print("Info for print of {} on {}:".format(lp_index_name, lpd.active_printer_name))
     print("  total depth along record:     {}mm".format(clip_ctl.total_depth__mm))
     print("  total height:                 {}mm".format(clip_ctl.total_height__mm))
-    print("  todo: more info")
 
     for warning in warnings:
         print("[yellow]{}[/yellow]".format(warning))
@@ -128,6 +139,7 @@ def validate(ctx, lp_index_name):
         t.add_column("lp_name")
         t.add_column("errors")
         t.add_column("warnings")
+        t.add_column("depth__mm")
 
         for lp_key, lp in lpd.lps():
             artist = _short_long_format(lp.full_artist, lp.short_artist)
@@ -140,7 +152,8 @@ def validate(ctx, lp_index_name):
                 artist,
                 lp_name,
                 str(len(errors)),
-                str(len(warnings))
+                str(len(warnings)),
+                str(clip_ctl.total_depth__mm)
             )
         console.print(t)
     else:

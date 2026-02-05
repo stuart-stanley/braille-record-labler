@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 from solid2.extensions.bosl2 import BOTTOM, FRONT, LEFT, TOP, RIGHT, BACK
 from solid2.extensions import bosl2
@@ -31,7 +32,7 @@ class RecordClipController:
         min_depth__mm = lp_config.front_side_min_depth__mm + lp_config.min_forward_tag_depth__mm
         if min_depth__mm > whole_depth__mm:
             whole_depth__mm = min_depth__mm
-
+        whole_depth__mm = math.ceil(whole_depth__mm)
         # NOTE: config enforces the front-side min being >= the back side min,
         # so we can use whole_depth__mm here.
         self.total_depth__mm = whole_depth__mm
@@ -157,10 +158,18 @@ class RecordClipController:
         printer = self.__cfgish.printer_geometry[using_printer_name]
         errors = []
         warnings = []
-        if self.total_depth__mm > printer.bed_deep__mm:
-            e = "print depth (along record) {}mm > printer {}'s depth {}mm".format(
-                self.total_depth__mm, using_printer_name, printer.bed_deep__mm)
+        # figure out the diagonal
+        diag__mm = math.sqrt(printer.bed_deep__mm**2 + printer.bed_wide__mm**2)
+        diag__mm -= 10   # remove enough to handle width. TODO: can calculate
+
+        if self.total_depth__mm > diag__mm:
+            e = "print depth (along record) {}mm > printer {}'s diag {}mm".format(
+                self.total_depth__mm, using_printer_name, diag__mm)
             errors.append(e)
+        if self.total_depth__mm > printer.bed_deep__mm:
+            w = "print depth (along record) {}mm > printer {}'s straight depth {}mm".format(
+                self.total_depth__mm, using_printer_name, printer.bed_deep__mm)
+            warnings.append(w)
         if self.total_depth__mm > self.__cfgish.label_config.max_depth__mm:
             e = "print depth (along record) {}mm > label_config max_depth__mm{}".format(
                 self.total_depth__mm, self.__cfgish.label_config.max_depth__mm)

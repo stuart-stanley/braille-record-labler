@@ -81,8 +81,9 @@ class _Record:
                 self.__global_overall_style_version, self.__state.overall_style_version)
 
         if self.__state.printed_checksum != self.calculated_checksum:
-            return True, "checksum changed from {} to {}".format(
-                self.__state.printed_checksum, self.calculated_checksum)
+            if self.__state.printed_checksum is None:
+                return True, "checksum changed from None to value"
+            return True, "checksum changed value"
         if self.__state.last_printed is None:
             return True, "never-printed"
 
