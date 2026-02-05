@@ -42,9 +42,13 @@ def _format_diffed(def_fmat, lp_record, setting_name):
     return "[bold]{}[/bold]".format(setting)
 
 
+_LIST_CHOICES = ['all', 'printing', 'unprinted', 'printed']
+
+
 @braille_record_labler.command()
+@click.option('--limit', '-l', default='all', type=click.Choice(_LIST_CHOICES))
 @click.pass_context
-def list(ctx):
+def list(ctx, limit):
     lpd = ctx.obj['lp_database']
     dfl = lpd.default_label_format
     cfi = ctx.obj['config_ish']
@@ -81,11 +85,21 @@ def list(ctx):
         lp_name = _short_long_format(lp.full_lp_name, lp.short_lp_name)
         clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
         errors, _ = clip_ctl.validate(lpd.active_printer_name)
+
+        needs_to_print, why_print = lp.needs_to_print()
+        if limit == 'printing' and not lp.out_for_printing:
+            continue
+        if limit == 'unprinted':
+            if not needs_to_print or lp.out_for_printing:
+                continue
+        if limit == 'printed' and needs_to_print:
+            continue
+
         if lp.last_printed is None:
             last_printed = 'never'
         else:
             last_printed = str(lp.last_printed)
-        needs_to_print, why_print = lp.needs_to_print()
+
         if lp.format_overridden:
             fmat = 'lp-specific'
         else:
