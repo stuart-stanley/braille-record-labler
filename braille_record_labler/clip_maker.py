@@ -137,6 +137,7 @@ class RecordClipController:
             fname = '{}.stl'.format(self.__lp_cfg.lp_key)
             filepath = Path('.').resolve() / fname
         self.__openscad_model.save_as_stl(filepath)
+        self.__lp_cfg.set_out_to_print(True)
 
     def __generate_visual_text(self, lp_config):
         visual_text_height__mm = self.__cfgish.tag_geometry.visual_text_height__mm

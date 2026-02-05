@@ -61,21 +61,26 @@ def list(ctx):
     t.add_column("lp-key")
     t.add_column("artist")
     t.add_column("lp_name")
+    t.add_column("valid")
     t.add_column('thickness')
+    t.add_column('depth-mm')
     t.add_column('bump-mm')
-    t.add_column("format")
-    t.add_column('cksum')
+    t.add_column('out-4-printing')
     t.add_column('last-printed')
+    t.add_column("format")
     t.add_column('back-depth')
     t.add_column('min-tag-depth-mm')
     t.add_column('tag-chars')
     t.add_column('visual-tag-chars')
     t.add_column('needs-to-print')
     t.add_column('why-to-print')
+    t.add_column('cksum')
 
     for lp_key, lp in lpd.lps():
         artist = _short_long_format(lp.full_artist, lp.short_artist)
         lp_name = _short_long_format(lp.full_lp_name, lp.short_lp_name)
+        clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
+        errors, _ = clip_ctl.validate(lpd.active_printer_name)
         if lp.last_printed is None:
             last_printed = 'never'
         else:
@@ -93,17 +98,20 @@ def list(ctx):
             lp.lp_key,
             artist,
             lp_name,
+            str(len(errors) == 0),
             str(lp.thickness__mm),
+            str(clip_ctl.total_depth__mm),
             str(lp.pressure_bump__mm),
-            fmat,
-            cksum,
+            str(lp.out_for_printing),
             last_printed,
+            fmat,
             _format_diffed(dfl, lp, 'back_side_depth__mm'),
             _format_diffed(dfl, lp, 'min_forward_tag_depth__mm'),
             _format_diffed(dfl, lp, 'forward_tag_depth_characters'),
             _format_diffed(dfl, lp, 'forward_tag_do_visual_characters'),
             str(needs_to_print),
-            why_print
+            why_print,
+            cksum,
         )
     console.print(t)
 
@@ -195,11 +203,13 @@ def generate(ctx, lp_index_name, output_path, file_name):
 @click.option('--file-name', '-f', type=click.types.File())
 @click.pass_context
 def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
+    lpd = ctx.obj['lp_database']
     op, ofp = _setup_output(output_path, file_name, lp_index_name, 'stl')
     valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
     if not valid:
         sys.exit(10)
     clip_ctl.do_stl(ofp)
+    lpd.set_out_to_print(lp_index_name, True)
     print_name = ctx.parent.info_name
     print("{} generated".format(ofp))
     print("")
@@ -209,11 +219,22 @@ def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
 
 @braille_record_labler.command()
 @click.argument('lp_index_name')
+@click.option('--cancel', '-c', default=False)
 @click.pass_context
-def complete(ctx, lp_index_name):
+def complete(ctx, lp_index_name, cancel):
     valid, clip_ctl = _common_print_and_validate(ctx, lp_index_name)
     if not valid:
         print("Can not complete print while config is invalid.")
         sys.exit(10)
     lpd = ctx.obj['lp_database']
-    lpd.complete_print(lp_index_name)
+    if cancel:
+        if clip_ctl.out_for_printing:
+            lpd.set_out_for_printing(lp_index_name, False)
+            print("{} 'out for printing' mark removed.'".format(lp_index_name))
+        else:
+            print("{} was not out for printing. No action done.")
+    else:
+        if not clip_ctl.out_for_printing:
+            print("NOTE: {} was not marked as out for printing.".format(lp_index_name))
+        lpd.complete_print(lp_index_name)
+        print("{} set to printed".format(lp_index_name))

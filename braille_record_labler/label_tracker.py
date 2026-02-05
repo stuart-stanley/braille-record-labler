@@ -59,6 +59,13 @@ class _Record:
     def last_printed(self):
         return self.__state.last_printed
 
+    @property
+    def out_for_printing(self):
+        return self.__state.out_for_printing
+
+    def set_out_to_print(self, is_it):
+        self.__state.out_for_printing = is_it
+
     def __init_format(self, use_format):
         """
         Format can be defined at the database level or overridden on
@@ -142,7 +149,8 @@ class RecordDataAccess:
                 a_state = {
                     'printed_checksum': None,
                     'last_printed': None,
-                    'overall_style_version': cfgish.overall_style_version
+                    'overall_style_version': cfgish.overall_style_version,
+                    'out_for_printing': False
                 }
 
             a_state = munch.munchify(a_state)
@@ -160,13 +168,21 @@ class RecordDataAccess:
         for lp_key in slpk:
             yield lp_key, self.__lp_map[lp_key]
 
-    def complete_print(self, lp_key):
-        lp = self.lp_by_key(lp_key)
-        lp.complete_print()
-
+    def __write_state(self):
         write_data = {'record_data': {}}
         for lp_key, lp in self.lps():
             write_data['record_data'][lp_key] = lp.state_for_save()
 
         with self.__state_path.open('w') as state_file:
             yaml.dump(write_data, state_file)
+
+    def set_out_to_print(self, lp_key, is_it):
+        lp = self.lp_by_key(lp_key)
+        lp.set_out_to_print(is_it)
+        self.__write_state()
+
+    def complete_print(self, lp_key):
+        lp = self.lp_by_key(lp_key)
+        lp.complete_print()
+        lp.set_out_to_print(False)
+        self.__write_state()

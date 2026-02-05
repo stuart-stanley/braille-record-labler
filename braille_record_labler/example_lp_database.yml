@@ -1,0 +1,135 @@
+active_printer: 'MA200'
+label_format:
+  min_forward_tag_depth__mm: 20
+  forward_tag_depth_characters: 2
+  forward_tag_do_visual_characters: true
+  back_side_depth__mm: 50
+  front_side_min_depth__mm: 50
+  default_pressure_bump__mm: 3
+record_data:
+  app_ammonis_avenue:
+    full_artist: 'alan parsons project'
+    full_lp_name: 'ammonia_avenue'
+    thickness__mm: 2
+  app_gaudi:
+    full_artist: 'alan parsons project'
+    full_lp_name: 'gaudi'
+    thickness__mm: 3
+  app_pyramid:
+    full_artist: 'alan parsons project'
+    full_lp_name: 'pyramid'
+    thickness__mm: 6
+  app_stereotomy:
+    full_artist: 'alan parsons project'
+    full_lp_name: 'stereotomy'
+    thickness__mm: 2
+  beths_future_me:
+    full_artist: 'beths'
+    full_lp_name: 'future me hates me'
+    thickness__mm: 4
+  holiday_lady:
+    full_artist: 'billy holiday'
+    full_lp_name: 'lady sings the blues'
+    thickness__mm: 4
+  chick_remeberence:
+    full_artist: 'chick corea & bela fleck'
+    short_artist: 'chick corea & bela'
+    full_lp_name: 'rememberence'
+    thickness__mm: 12
+  cocteau_heaven:
+    full_artist: 'cocteau twins'
+    full_lp_name: 'heaven or las vegas'
+    thickness__mm: 3
+  cocteau_victoria:
+    full_artist: 'cocteau twins'
+    full_lp_name: 'victoria land'
+    thickness__mm: 4
+  interpol_antics:
+    full_artist: 'interpol'
+    full_lp_name: 'antics'
+    thickness__mm: 4
+  tull_best_of:
+    full_artist: 'jethro tull'
+    full_lp_name: 'best of jetro tull'
+    thickness__mm: 3
+  first_aid_gold:
+    full_artist: 'first aid kit'
+    full_lp_name: 'stay gold'
+    thickness__mm: 7
+  fleetwood_mac:
+    full_artist: 'fleetwood mac'
+    full_lp_name: 'fleetwood mac'
+    thickness__mm: 3
+  fa_interludes:
+    full_artist: 'fresh aire'
+    full_lp_name: 'interludes'
+    thickness__mm: 2
+  metric_underground:
+    full_artist: 'metric'
+    full_lp_name: 'old world underground where are you now'
+    short_lp_name: 'old world underground'
+    thickness__mm: 3
+  joni_michell_court:
+    full_artist: 'joni michell'
+    full_lp_name: 'court and sparks'
+    thickness__mm: 6
+  ms_xmas_25:
+    full_artist: 'mannheim steamroller'
+    full_lp_name: 'christmas 35th anniversary'
+    short_lp_name: 'christmas 35th'
+    thickness__mm: 2
+  ms_xmas_extra:
+    full_artist: 'mannheim steamroller'
+    full_lp_name: 'christmas extraordinaire'
+    short_lp_name: 'christmas extra'
+    thickness__mm: 3
+  ms_xmas_aire:
+    full_artist: 'mannheim steamroller'
+    full_lp_name: 'christmas in the aire'
+    thickness__mm: 3
+  neko_cyclone:
+    full_artist: 'neko case'
+    full_lp_name: 'middle cyclone'
+    thickness__mm: 8
+  new_porno_challangers:
+    full_artist: 'new pornographers'
+    full_lp_name: 'challangers'
+    thickness__mm: 3
+  pj_england:
+    full_artist: 'pj harvey'
+    full_lp_name: 'let england shake'
+    thickness__mm: 3
+  prince_purple_rain:
+    full_artist: 'prince and the revolution'
+    full_lp_name: 'purple rain'
+    thickness__mm: 4
+  queen_hits:
+    full_artist: 'queen'
+    full_lp_name: 'greatest hits'
+    thickness__mm: 8
+  stop_making_sense:
+    full_artist: 'talking heads'
+    full_lp_name: 'stop mk sense'
+    thickness__mm: 4
+  tbtl_hits:
+    full_artist: 'too beautiful too live'
+    full_lp_name: 'greatest hits'
+    thickness__mm: 3
+  water_peace:
+    full_artist: 'water from your eyes'
+    full_lp_name: 'a beautiful peace'
+    thickness__mm: 4
+  ws_get_behind_me:
+    full_artist: 'white stripes'
+    full_lp_name: 'get behind me satan'
+    thickness__mm: 7
+  yes_fragile:
+    full_artist: 'yes'
+    full_lp_name: 'fragile'
+    thickness__mm: 5
+  yes_topo:
+    full_artist: 'yes'
+    full_lp_name: 'topographic ocean'
+    short_lp_name: 'topographic oce'
+    thickness__mm: 5
+    

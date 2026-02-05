@@ -5,3 +5,4 @@ an_lp:
   printed_checksum: any(str(), null())
   last_printed: any(timestamp(), null())
   overall_style_version: int()
+  out_for_printing: bool()
