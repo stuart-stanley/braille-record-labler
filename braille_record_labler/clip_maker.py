@@ -14,7 +14,8 @@ class RecordClipController:
         # Step 1: make and see how big the braille wants to be...
         lines = [lp_config.short_artist, lp_config.short_lp_name]
         circle_fn = self.__cfgish.tag_geometry.line_segments_per_circle
-        braille_panel = braille_scad.MultilineBrailleScad(lines, circle_fn=circle_fn)
+        braille_panel = braille_scad.MultilineBrailleScad(
+            lines, lp_config.braille_back_to_front, circle_fn=circle_fn)
         self.__braille_panel = braille_panel
 
         # ok! now lets make the parts of the "h"ish shape that will the clip.

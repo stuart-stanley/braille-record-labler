@@ -110,8 +110,9 @@ class _CellInfo:
 
 
 class MultilineBrailleScad:
-    def __init__(self, str_list, circle_fn=CIRCLE_FN):
+    def __init__(self, str_list, back_to_front, circle_fn=CIRCLE_FN):
         self.__circle_fn = circle_fn
+        self.__back_to_front = back_to_front
         current_height__mm = len(str_list) * LINE_TO_LINE__MM
         full_scad = solid2.union()
         max_depth__mm = -1
@@ -152,13 +153,22 @@ class MultilineBrailleScad:
         uni_br = touchmap.text_to_braille(src_string, grade=2)
         cell_bin_str = touchmap.text_to_braille(src_string, grade=2, binary=True)
         assert (len(uni_br) == len(cell_bin_str) / 6)
-        colors = ["red", "blue", "green"]
+        # convert the "binary" cells to a list.
+        cell_list = []
+        for inx in range(0, len(uni_br)):
+            offset = inx * 6
+            bin_clip = cell_bin_str[offset:offset + 6]
+            cell_list.append(bin_clip)
 
+        if self.__back_to_front:
+            uni_br = ''.join(reversed(list(uni_br)))
+            cell_list = list(reversed(cell_list))
+
+        colors = ["red", "blue", "green"]
         # Step 2: walk through the outputs and make a cell for each one.
         out_scad = solid2.union()
         for inx in range(0, len(uni_br)):
-            bin_clip = cell_bin_str[inx*6:]
-            cell = _CellInfo(uni_br[inx], bin_clip[:6], self.__circle_fn)
+            cell = _CellInfo(uni_br[inx], cell_list[inx], self.__circle_fn)
             # cell.dump_dot_values()
             out_scad += solid2.translate([0, inx * CELL_SPACING__MM + MARGIN__MM, 0])(
                 solid2.color(colors[inx % 3])(

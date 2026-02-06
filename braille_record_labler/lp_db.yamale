@@ -18,3 +18,4 @@ label_format:
   back_side_depth__mm: int(min=1)
   front_side_min_depth__mm: int(min=1)
   default_pressure_bump__mm: int(min=1)
+  braille_back_to_front: bool()

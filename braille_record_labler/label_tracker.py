@@ -46,6 +46,7 @@ class _Record:
         cksum.update(str(self.back_side_depth__mm).encode('utf-8'))
         cksum.update(str(self.front_side_min_depth__mm).encode('utf-8'))
         cksum.update(str(self.default_pressure_bump__mm).encode('utf-8'))
+        cksum.update(str(self.braille_back_to_front).encode('utf-8'))
         self.calculated_checksum = cksum.hexdigest()
         self.__state = state_data
 
@@ -78,6 +79,7 @@ class _Record:
         self.back_side_depth__mm = use_format['back_side_depth__mm']
         self.front_side_min_depth__mm = use_format['front_side_min_depth__mm']
         self.default_pressure_bump__mm = use_format['default_pressure_bump__mm']
+        self.braille_back_to_front = use_format['braille_back_to_front']
         assert self.back_side_depth__mm <= self.front_side_min_depth__mm, \
             'min front {} must be >= min back {}'.format(
                 self.front_side_min_depth__mm, self.back_side_depth__mm)

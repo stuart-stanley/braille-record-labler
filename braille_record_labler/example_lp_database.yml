@@ -6,6 +6,7 @@ label_format:
   back_side_depth__mm: 50
   front_side_min_depth__mm: 50
   default_pressure_bump__mm: 3
+  braille_back_to_front: True
 record_data:
   app_ammonis_avenue:
     full_artist: 'alan parsons project'
