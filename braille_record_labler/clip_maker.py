@@ -114,7 +114,8 @@ class RecordClipController:
             final = h_and_braille + txt_positioned
         else:
             final = h_and_braille
-        self.__openscad_model = final
+        # rotate 45 degrees to make use of build plate space by default
+        self.__openscad_model = final.rotate([0, 0, 45])
         self.__validated = False
         self.__is_valid = False
 

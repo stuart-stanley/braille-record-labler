@@ -137,6 +137,9 @@ class RecordDataAccess:
         yamale.validate(self.__db_state_schema, state_data)
         # yamale CAN handle multiple documents. We only do one, so:
         state_data = state_data[0][0]['record_data']
+        # handle fresh file
+        if state_data is None:
+            state_data = {}
 
         self.active_printer_name = main_data['active_printer']
         # Scan the list of records and create a Record() for each. We

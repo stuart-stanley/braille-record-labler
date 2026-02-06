@@ -217,7 +217,7 @@ def generate(ctx, lp_index_name, output_path, file_name):
         if file_name is not None:
             raise click.BadParameter("Can not generate all AND set output file name")
         for lp_key, lp in lpd.lps():
-            _do_one_generate(ctx, output_path, file_name, lp_index_name)
+            _do_one_generate(ctx, output_path, file_name, lp_key)
     else:
         _do_one_generate(ctx, output_path, file_name, lp_index_name)
 
@@ -255,7 +255,7 @@ def print_cmd(ctx, lp_index_name, output_path, file_name, name='print'):
             else:
                 _do_one_print(ctx, output_path, file_name, lp_key)
     else:
-        _do_one_print(ctx, output_path, file_name, lp_key)
+        _do_one_print(ctx, output_path, file_name, lp_index_name)
 
 
 @braille_record_labler.command()
