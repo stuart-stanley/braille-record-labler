@@ -268,14 +268,15 @@ def complete(ctx, lp_index_name, cancel):
         print("Can not complete print while config is invalid.")
         sys.exit(10)
     lpd = ctx.obj['lp_database']
+    lp = lpd.lp_by_key(lp_index_name)
     if cancel:
-        if clip_ctl.out_for_printing:
+        if lp.out_for_printing:
             lpd.set_out_for_printing(lp_index_name, False)
             print("{} 'out for printing' mark removed.'".format(lp_index_name))
         else:
             print("{} was not out for printing. No action done.")
     else:
-        if not clip_ctl.out_for_printing:
+        if not lp.out_for_printing:
             print("NOTE: {} was not marked as out for printing.".format(lp_index_name))
         lpd.complete_print(lp_index_name)
         print("{} set to printed".format(lp_index_name))
