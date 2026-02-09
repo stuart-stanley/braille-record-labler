@@ -1,6 +1,6 @@
 overall_style_version: 1
 printer_geometry:
-  'MA200':
+  'M200V2':
     bed_wide__mm: 120
     bed_deep__mm: 120
     bed_height__mm: 120

@@ -1,4 +1,4 @@
-active_printer: 'MA200'
+active_printer: 'M200V2'
 label_format:
   min_forward_tag_depth__mm: 20
   forward_tag_depth_characters: 2
