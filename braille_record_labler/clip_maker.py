@@ -141,6 +141,14 @@ class RecordClipController:
         self.__openscad_model.save_as_stl(filepath)
         self.__lp_cfg.set_out_to_print(True)
 
+    @property
+    def braille_artist(self):
+        return self.__braille_panel.braille_lines[0]
+
+    @property
+    def braille_lp_name(self):
+        return self.__braille_panel.braille_lines[1]
+
     def __generate_visual_text(self, lp_config):
         visual_text_height__mm = self.__cfgish.tag_geometry.visual_text_height__mm
         txt_chars = lp_config.full_artist[:lp_config.forward_tag_depth_characters]

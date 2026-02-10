@@ -119,8 +119,10 @@ class MultilineBrailleScad:
         longest_line = None
         longest_line_index = -1
         inx = 0
+        self.braille_lines = []
         for src_string in str_list:
-            line_scad, line_size_info = self.__str_to_braille_scad(src_string)
+            line_scad, line_size_info, line_braille = self.__str_to_braille_scad(src_string)
+            self.braille_lines.append(line_braille)
             depth__mm = line_size_info[0]
             if depth__mm > max_depth__mm:
                 max_depth__mm = depth__mm
@@ -178,4 +180,4 @@ class MultilineBrailleScad:
         width__mm = len(uni_br) * CELL_SPACING__MM
         width__mm += MARGIN__MM * 2
         size_info = [width__mm, LINE_TO_LINE__MM, DOT_TOTAL_HEIGHT__MM]
-        return out_scad, size_info
+        return out_scad, size_info, uni_br

@@ -81,9 +81,11 @@ def list(ctx, limit):
     t.add_column('cksum')
 
     for lp_key, lp in lpd.lps():
+        clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
         artist = _short_long_format(lp.full_artist, lp.short_artist)
         lp_name = _short_long_format(lp.full_lp_name, lp.short_lp_name)
-        clip_ctl = clip_maker.RecordClipController(lp, ctx.obj['configish_file'])
+        br_artist = clip_ctl.braille_artist
+        br_lp_name = clip_ctl.braille_lp_name
         errors, _ = clip_ctl.validate(lpd.active_printer_name)
 
         needs_to_print, why_print = lp.needs_to_print()
@@ -110,8 +112,8 @@ def list(ctx, limit):
             cksum = "set"
         t.add_row(
             lp.lp_key,
-            artist,
-            lp_name,
+            "{}\n{}".format(artist, br_artist),
+            "{}\n{}".format(lp_name, br_lp_name),
             str(len(errors) == 0),
             str(lp.thickness__mm),
             str(clip_ctl.total_depth__mm),
