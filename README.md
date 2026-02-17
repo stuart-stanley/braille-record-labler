@@ -1,6 +1,6 @@
 # braille-record-labler
 
-![Picture of collection of records with braille labels](braille_record_labeler/assets/readme_collection.png)
+![Picture of collection of records with braille labels](braille_record_labler/assets/readme_collection.png)
 
 ## Intro
 Welcome to a tool to create 3d printable braille labels for vinyl records! This came about
