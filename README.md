@@ -1,5 +1,7 @@
 # braille-record-labler
 
+![Picture of collection of records with braille labels](braille_record_labeler/assets/readme_collection.png)
+
 ## Intro
 Welcome to a tool to create 3d printable braille labels for vinyl records! This came about
 when my housemate, who happens to be blind, foolishly got into old style LP records. Super cool
@@ -25,7 +27,15 @@ in the "setting things up" section.
   home in on the right part of the alphabet!
 - Optional ability to reverse the braille text. There is a fun story behind that in the
   section called "design and history."
-- driven by a 
+- driven by a cli that keeps track of each label, letting you:
+  - see if it needs to be printed. Either because it never has or you changed something in the
+    configuration that would change what gets printed.
+  - see if the print file (.stl) has been created, but not printed yet. 
+  - validate if the label(s) can be printed on this printer's bed.
+  - generate .scad files, so you can tinker around in openSCAD.
+  - "print" the label to a .stl file.
+  - mark a given label as having been printed.
+  
 
 ## Defining records
 
@@ -56,7 +66,7 @@ record_data:
     short_lp_name: 'old world underground'
 ```
 
-### Active_printer
+### active_printer
 
 The `active_printer` is a simple string saying what printer you have. Printers are defined
 in `braille_record_labler/default_configish.yml` and basically hold the geometry of the printing space.
@@ -78,7 +88,11 @@ The `label_format` block lets you define and tune what the label looks like.
 
 notes from experiments to turn into suggestions:
 - print "on edge" (which is how the stl is generated, so probably just works)
-- print with a skirt, especially on long depth prints. They like to detatch and warp upwards at the
-  prong end.
+- print with a skirt, especially on long depth prints. They like to detatch and warp upwards
+  at the prong end.
 - "normal" quality seems to work best just because finer tends to thread more.
-- printing one at a time makes for a cleaner print, but that could just because I haven't dialed in setting to limit threading.
+- printing one at a time makes for a cleaner print, but that could just because I haven't
+  dialed in setting to limit threading.
+
+
+## Setting things up
